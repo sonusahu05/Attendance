@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "981223545023",
+    "project_id": "ayyendance-spit",
+    "storage_bucket": "ayyendance-spit.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981223545023:android:5bf0ef09e26d73f2678e0a",
+        "android_client_info": {
+          "package_name": "com.example.attendance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "981223545023-hiup1lm4f864lqlo6qoj9uaef0uvmvuf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEQ2xNnACWsdXMRIWFfQ3uYssLWuLfyYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981223545023-hiup1lm4f864lqlo6qoj9uaef0uvmvuf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
