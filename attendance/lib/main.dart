@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:attendance/constants/routes.dart';
 import 'package:attendance/firebase_options.dart';
 import 'package:attendance/views/login_view.dart';
 import 'package:attendance/views/register_view.dart';
@@ -5,6 +8,7 @@ import 'package:attendance/views/verify_email.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,9 +19,10 @@ void main() {
     ),
     home: const HomePage(),
     routes: {
-      '/login/': (context) => const LoginView(),
-      '/register/': (context) => const Registerview(),
-      '/verify/': (context) => const VerifyEmail()
+      loginRoute: (context) => const LoginView(),
+      registerRoute: (context) => const Registerview(),
+      verifyRoute: (context) => const VerifyEmail(),
+      mainRoute: (context) => const MainUI(),
     },
   ));
 }
@@ -35,7 +40,7 @@ class HomePage extends StatelessWidget {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             final user = FirebaseAuth.instance.currentUser;
-            print(user);
+            devtools.log(user.toString());
             if (user != null) {
               if (user.emailVerified) {
                 return const MainUI();
@@ -45,7 +50,6 @@ class HomePage extends StatelessWidget {
             } else {
               return const LoginView();
             }
-            
 
           default:
             return const CircularProgressIndicator();
@@ -53,6 +57,10 @@ class HomePage extends StatelessWidget {
       },
     );
   }
+}
+
+enum MenuAction {
+  logout;
 }
 
 class MainUI extends StatefulWidget {
@@ -66,7 +74,67 @@ class _MainUIState extends State<MainUI> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Main UI")),
-    );
+        appBar: AppBar(
+          title: const Text("Main UI"),
+          actions: [
+            PopupMenuButton<MenuAction>(
+              onSelected: (value) async {
+                switch (value) {
+                  case MenuAction.logout:
+                    final shouldLogOut = await showLogOutDialog(context);
+                    devtools.log(shouldLogOut.toString());
+                    if (shouldLogOut) {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.of(context)
+                          .pushNamedAndRemoveUntil(loginRoute, (_) => false);
+                    }
+                    break;
+                }
+              },
+              itemBuilder: (context) {
+                return const [
+                  PopupMenuItem<MenuAction>(
+                      value: MenuAction.logout, child: Text("logout"))
+                ];
+              },
+            )
+          ],
+        ),
+        body: Center(
+            child: Column(
+          children: <Widget>[
+            const Text('Hey Mansi Good Luck For your exams 😊😊😊'),
+            Image.asset(
+              'assets/images/moon.png',
+              height: 500,
+              width: 600,
+            ),
+          ],
+        )));
   }
 }
+
+Future<bool> showLogOutDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("Sign Out"),
+        content: const Text("Are you Sure You Want to Sign Out?"),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text("Cancel")),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text("Logout")),
+        ],
+      );
+    },
+  ).then((value) => value ?? false);
+}
+
