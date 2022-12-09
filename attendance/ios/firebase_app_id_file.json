@@ -1,7 +1,7 @@
 {
   "file_generated_by": "FlutterFire CLI",
   "purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory",
-  "GOOGLE_APP_ID": "1:981223545023:ios:873fb2501cdd4ab3678e0a",
-  "FIREBASE_PROJECT_ID": "ayyendance-spit",
-  "GCM_SENDER_ID": "981223545023"
+  "GOOGLE_APP_ID": "1:172073501542:ios:d2e47d4f2779e54f84fea7",
+  "FIREBASE_PROJECT_ID": "spitattendance",
+  "GCM_SENDER_ID": "172073501542"
 }

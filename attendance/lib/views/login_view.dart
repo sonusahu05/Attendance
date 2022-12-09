@@ -62,32 +62,52 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  mainRoute,
-                  (route) => false,
-                );
-                devtools.log(userCredientials.toString());
+                final user = FirebaseAuth.instance.currentUser;
+                if(user?.emailVerified ?? false){
+                    // ignore: use_build_context_synchronously
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    mainRoute,
+                    (route) => false,
+                  );
+                }else{
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    verifyRoute,
+                    (route) => false,
+                  );
+                  
+                }
+                  
               } on FirebaseAuthException catch (e) {
                 if (e.code == "user-not-found") {
                   devtools.log("User Not Found");
-                  await showErrorDialog(context, "User Not Found",);
-
+                  await showErrorDialog(
+                    context,
+                    "User Not Found",
+                  );
 
                   // const AlertDialog(title: Text("Error"),content: Text("User Not Found"),);
                 } else if (e.code == "wrong-password") {
                   devtools.log('Incorrect password');
-                  await showErrorDialog(context, "Incorrect password",);
+                  await showErrorDialog(
+                    context,
+                    "Incorrect password",
+                  );
                 } else {
-                  await showErrorDialog(context, "Error : ${e.code}",);
+                  await showErrorDialog(
+                    context,
+                    "Error : ${e.code}",
+                  );
                 }
-                
+
                 // return const Text(e.code);
 
+              } catch (e) {
+                await showErrorDialog(
+                  context,
+                  e.toString(),
+                );
               }
-              catch (e){
-                  await showErrorDialog(context, e.toString(),);
-                }
               // catch (e) {
               //   print(e);
               //   // print(e.code);
@@ -108,4 +128,3 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
-

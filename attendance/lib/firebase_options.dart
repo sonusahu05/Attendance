@@ -44,39 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDe4hSf2l9d4myC61b3gs1zi9tkNjYMJs8',
-    appId: '1:981223545023:web:e892bd0c823218d6678e0a',
-    messagingSenderId: '981223545023',
-    projectId: 'ayyendance-spit',
-    authDomain: 'ayyendance-spit.firebaseapp.com',
-    storageBucket: 'ayyendance-spit.appspot.com',
+    apiKey: 'AIzaSyDPc2bGh5ry5BH0N3t2UBYH_W-nF_W9eFc',
+    appId: '1:172073501542:web:033d773e639339d684fea7',
+    messagingSenderId: '172073501542',
+    projectId: 'spitattendance',
+    authDomain: 'spitattendance.firebaseapp.com',
+    storageBucket: 'spitattendance.appspot.com',
+    measurementId: 'G-2KGGR4Q5GB',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDEQ2xNnACWsdXMRIWFfQ3uYssLWuLfyYM',
-    appId: '1:981223545023:android:5bf0ef09e26d73f2678e0a',
-    messagingSenderId: '981223545023',
-    projectId: 'ayyendance-spit',
-    storageBucket: 'ayyendance-spit.appspot.com',
+    apiKey: 'AIzaSyDYYhnIEtATeRIRdj0cNulxlBirXM4ZtMI',
+    appId: '1:172073501542:android:413f1061c7d0dc2f84fea7',
+    messagingSenderId: '172073501542',
+    projectId: 'spitattendance',
+    storageBucket: 'spitattendance.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBnVMlgOlqtrc9N-OHDsHO1CG9RbOtJ7Bo',
-    appId: '1:981223545023:ios:873fb2501cdd4ab3678e0a',
-    messagingSenderId: '981223545023',
-    projectId: 'ayyendance-spit',
-    storageBucket: 'ayyendance-spit.appspot.com',
-    iosClientId: '981223545023-agvdj93ljmc9ga2lm4gjirukh0g8v5kr.apps.googleusercontent.com',
+    apiKey: 'AIzaSyC0IhPdrb49raczSRxramm3hmyx4JOjzC0',
+    appId: '1:172073501542:ios:d2e47d4f2779e54f84fea7',
+    messagingSenderId: '172073501542',
+    projectId: 'spitattendance',
+    storageBucket: 'spitattendance.appspot.com',
+    iosClientId: '172073501542-bigpj08kiepms0sf21tene0ucokubhod.apps.googleusercontent.com',
     iosBundleId: 'com.example.attendance',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBnVMlgOlqtrc9N-OHDsHO1CG9RbOtJ7Bo',
-    appId: '1:981223545023:ios:873fb2501cdd4ab3678e0a',
-    messagingSenderId: '981223545023',
-    projectId: 'ayyendance-spit',
-    storageBucket: 'ayyendance-spit.appspot.com',
-    iosClientId: '981223545023-agvdj93ljmc9ga2lm4gjirukh0g8v5kr.apps.googleusercontent.com',
+    apiKey: 'AIzaSyC0IhPdrb49raczSRxramm3hmyx4JOjzC0',
+    appId: '1:172073501542:ios:d2e47d4f2779e54f84fea7',
+    messagingSenderId: '172073501542',
+    projectId: 'spitattendance',
+    storageBucket: 'spitattendance.appspot.com',
+    iosClientId: '172073501542-bigpj08kiepms0sf21tene0ucokubhod.apps.googleusercontent.com',
     iosBundleId: 'com.example.attendance',
   );
 }
