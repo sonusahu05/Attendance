@@ -1,63 +1,75 @@
-
-import 'package:attendance/constants/routes.dart';
-import 'package:attendance/firebase_options.dart';
-import 'package:attendance/views/login_view.dart';
-import 'package:attendance/views/main_view.dart';
-import 'package:attendance/views/register_view.dart';
-import 'package:attendance/views/verify_email.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:attendance/constants/routes.dart';
+import 'package:attendance/helpers/loading/loading_screen.dart';
+import 'package:attendance/services/auth/bloc/auth_bloc.dart';
+import 'package:attendance/services/auth/bloc/auth_event.dart';
+import 'package:attendance/services/auth/bloc/auth_state.dart';
+import 'package:attendance/services/auth/firebase_auth_provider.dart';
+import 'package:attendance/views/forgot_password_view.dart';
+import 'package:attendance/views/login_view.dart';
+import 'package:attendance/views/notes/create_update_note_view.dart';
+import 'package:attendance/views/notes/notes_view.dart';
+import 'package:attendance/views/register_view.dart';
+import 'package:attendance/views/verify_email_view.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MaterialApp(
-    title: 'Attendance',
-    theme: ThemeData(
-      primarySwatch: Colors.blue,
+  runApp(
+    MaterialApp(
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
+        child: const HomePage(),
+      ),
+      routes: {
+        createOrUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
+      },
     ),
-    home: const HomePage(),
-    routes: {
-      loginRoute: (context) => const LoginView(),
-      registerRoute: (context) => const Registerview(),
-      verifyRoute: (context) => const VerifyEmail(),
-      mainRoute: (context) => const MainUI(),
-    },
-  ));
+  );
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.done:
-            final user = FirebaseAuth.instance.currentUser;
-            devtools.log(user.toString());
-            if (user != null) {
-              if (user.emailVerified) {
-                return const MainUI();
-              } else {
-                return const VerifyEmail();
-              }
-            } else {
-              return const LoginView();
-            }
-
-          default:
-            return const CircularProgressIndicator();
+    context.read<AuthBloc>().add(const AuthEventInitialize());
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state.isLoading) {
+          LoadingScreen().show(
+            context: context,
+            text: state.loadingText ?? 'Please wait a moment',
+          );
+        } else {
+          LoadingScreen().hide();
+        }
+      },
+      builder: (context, state) {
+        if (state is AuthStateLoggedIn) {
+          return const NotesView();
+        } else if (state is AuthStateNeedsVerification) {
+          return const VerifyEmailView();
+        } else if (state is AuthStateLoggedOut) {
+          return const LoginView();
+        } else if (state is AuthStateForgotPassword) {
+          return const ForgotPasswordView();
+        } else if (state is AuthStateRegistering) {
+          return const RegisterView();
+        } else {
+          return const Scaffold(
+            body: CircularProgressIndicator(),
+          );
         }
       },
     );
   }
 }
-
-
-

@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:attendance/firebase_options.dart';
 import 'package:attendance/services/auth/auth_user.dart';
 import 'package:attendance/services/auth/auth_provider.dart';
@@ -5,8 +6,6 @@ import 'package:attendance/services/auth/auth_exceptions.dart';
 
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
-
-import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
   @override
@@ -40,10 +39,10 @@ class FirebaseAuthProvider implements AuthProvider {
       } else if (e.code == 'invalid-email') {
         throw InvalidEmailAuthException();
       } else {
-        throw GenericInAuthException();
+        throw GenericAuthException();
       }
     } catch (_) {
-      throw GenericInAuthException();
+      throw GenericAuthException();
     }
   }
 
@@ -79,10 +78,10 @@ class FirebaseAuthProvider implements AuthProvider {
       } else if (e.code == 'wrong-password') {
         throw WrongPasswordAuthException();
       } else {
-        throw GenericInAuthException();
+        throw GenericAuthException();
       }
     } catch (_) {
-      throw GenericInAuthException();
+      throw GenericAuthException();
     }
   }
 
@@ -117,10 +116,10 @@ class FirebaseAuthProvider implements AuthProvider {
         case 'firebase_auth/user-not-found':
           throw UserNotFoundAuthException();
         default:
-          throw GenericInAuthException();
+          throw GenericAuthException();
       }
     } catch (_) {
-      throw GenericInAuthException();
+      throw GenericAuthException();
     }
   }
 }

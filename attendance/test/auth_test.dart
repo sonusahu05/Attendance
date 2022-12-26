@@ -64,7 +64,7 @@ void main() {
       final user = provider.currentUser;
       expect(user, isNotNull);
       expect(user!.isEmailVerified, true);
-    });flutter pub add spflite
+    });
     
     test('Should be able to log out and log in again', () async {
       await provider.logOut();
