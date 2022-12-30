@@ -1,3 +1,4 @@
+import 'package:attendance/constants/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:attendance/extensions/buildcontext/loc.dart';
 import 'package:attendance/services/auth/auth_exceptions.dart';
@@ -87,6 +88,7 @@ class _LoginViewState extends State<LoginView> {
                   onPressed: () async {
                     final email = _email.text;
                     final password = _password.text;
+                    //doubt
                     context.read<AuthBloc>().add(
                           AuthEventLogIn(
                             email,
@@ -98,6 +100,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 TextButton(
                   onPressed: () {
+                    //doubt
                     context.read<AuthBloc>().add(
                           const AuthEventForgotPassword(),
                         );
@@ -115,7 +118,7 @@ class _LoginViewState extends State<LoginView> {
                   child: Text(
                     context.loc.login_view_not_registered_yet,
                   ),
-                )
+                ),               
               ],
             ),
           ),

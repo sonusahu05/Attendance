@@ -3,3 +3,9 @@
 // const verifyRoute = '/verify/';
 // const mainRoute = '/main/';
 const createOrUpdateNoteRoute = '/notes/new-note/';
+const concession = '/concession/';
+const common = '/common/';
+const concessionRegister = '/concessionRegister/';
+const concessionStatus = '/concessionStatus/';
+const concessionRequest = '/concessionRequest/';
+const note = '/note/';

@@ -1,3 +1,8 @@
+import 'package:attendance/views/common_view.dart';
+import 'package:attendance/views/concession/concession_register.dart';
+import 'package:attendance/views/concession/concession_request.dart';
+import 'package:attendance/views/concession/concession_status.dart';
+import 'package:attendance/views/concession/concession_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:attendance/constants/routes.dart';
@@ -30,6 +35,12 @@ void main() {
         child: const HomePage(),
       ),
       routes: {
+        note: (context) => const NotesView(),
+        concessionRegister: (context) => const ConcessionRegister(),
+        concessionStatus: (context) => const ConcessionStatus(),
+        concessionRequest: (context) => const ConcessionRequest(),
+        common: (context) => const CommonView(),
+        concession: (context) => const ConcessionView(),
         createOrUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
       },
     ),
@@ -55,7 +66,7 @@ class HomePage extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is AuthStateLoggedIn) {
-          return const NotesView();
+          return const CommonView();
         } else if (state is AuthStateNeedsVerification) {
           return const VerifyEmailView();
         } else if (state is AuthStateLoggedOut) {

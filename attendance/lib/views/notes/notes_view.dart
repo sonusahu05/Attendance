@@ -55,30 +55,31 @@ class _NotesViewState extends State<NotesView> {
             },
             icon: const Icon(Icons.add),
           ),
-          PopupMenuButton<MenuAction>(
-            onSelected: (value) async {
-              switch (value) {
-                case MenuAction.logout:
-                  final shouldLogout = await showLogOutDialog(context);
-                  if (shouldLogout) {
-                    context.read<AuthBloc>().add(
-                          const AuthEventLogOut(),
-                        );
-                  }
-              }
-            },
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem<MenuAction>(
-                  value: MenuAction.logout,
-                  child: Text(context.loc.logout_button),
-                ),
-              ];
-            },
-          )
+          // PopupMenuButton<MenuAction>(
+          //   onSelected: (value) async {
+          //     switch (value) {
+          //       case MenuAction.logout:
+          //         final shouldLogout = await showLogOutDialog(context);
+          //         if (shouldLogout) {
+          //           context.read<AuthBloc>().add(
+          //                 const AuthEventLogOut(),
+          //               );
+          //         }
+          //     }
+          //   },
+          //   itemBuilder: (context) {
+          //     return [
+          //       PopupMenuItem<MenuAction>(
+          //         value: MenuAction.logout,
+          //         child: Text(context.loc.logout_button),
+          //       ),
+          //     ];
+          //   },
+          // )
         ],
       ),
       body: StreamBuilder(
+        
         stream: _notesService.allNotes(ownerUserId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
