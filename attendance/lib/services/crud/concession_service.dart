@@ -1,16 +1,74 @@
-import 'dart:ffi';
-import 'package:attendance/constants/routes.dart';
+import 'dart:async';
+import 'package:attendance/extensions/list/filter.dart';
 import 'package:attendance/services/crud/crud_exceptions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
+
 DateTime now = DateTime.now();
 DateTime date = DateTime(now.year, now.month, now.day);
 
-
 class ConcessionService {
   Database? _db2;
+  List<DatabaseConcession> _concessions = [];
+  // DatabaseUser? _user;
+
+  static final ConcessionService _shared = ConcessionService._sharedInstance();
+  ConcessionService._sharedInstance();
+  // ConcessionService._sharedInstance() {
+  //   _concessionsStreamController =
+  //       StreamController<List<DatabaseConcession>>.broadcast(
+  //     onListen: () {
+  //       _concessionsStreamController.sink.add(_concessions);
+  //     },
+  //   );
+  // }
+  factory ConcessionService() => _shared;
+
+  final _concessionsStreamController =
+      StreamController<List<DatabaseConcession>>.broadcast();
+
+  Stream<List<DatabaseConcession>> get allConcessions => _concessionsStreamController.stream;
+  // late final StreamController<List<DatabaseConcession>>
+  //     _concessionsStreamController;
+
+  // Stream<List<DatabaseConcession>> get allConcessions =>
+  //     _concessionsStreamController.stream.filter((concession) {
+  //       final currentUser = _user;
+  //       if (currentUser != null) {
+  //         return concession.userId == currentUser.id;
+  //       } else {
+  //         throw UserShouldBeSetBeforeReadingAllNotes();
+  //       }
+  //     });
+
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
+    try {
+      final user = await getUser(email: email);
+      // if (setAsCurrentUser) {
+      //   _user = user;
+      // }
+      return user;
+    } on CouldNotFindUser {
+      final createdUser = await createUser(email: email);
+      // if (setAsCurrentUser) {
+      //   _user = createdUser;
+      // }
+      return createdUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> _cacheConcessions() async {
+    final allConcessions = await getAllNotes();
+    _concessions = allConcessions.toList();
+    _concessionsStreamController.add(_concessions);
+  }
 
   Future<DatabaseConcession> updateConcession({
     required DatabaseConcession concession,
@@ -27,7 +85,7 @@ class ConcessionService {
     required bool receivedStatus,
     required bool completedStatus,
   }) async {
-    // await _ensureDbIsOpen();
+    await _ensureDbIsOpen();
     final db2 = _getDatabaseOrThrow();
 
     // make sure note exists
@@ -40,18 +98,18 @@ class ConcessionService {
         // textColumn: text,
         // isSyncedWithCloudColumn: 0,
         // userIdColumn: owner.id,
-        nameColumn:"",
-        genderColumn:"",
+        nameColumn: "",
+        genderColumn: "",
         // emailColumn: owner.email,
-        nearestStationColumn:"",
-        addressColumn:"",
-        dobColumn:DateTime.parse(date as String),
+        nearestStationColumn: "",
+        addressColumn: "",
+        dobColumn: DateTime.parse(date as String),
         // destinationStationColumn:"Andheri",
-        trainClassColumn:"",
-        periodColumn:"",
+        trainClassColumn: "",
+        periodColumn: "",
         // dateOfApplicationColumn:DateTime.parse(date as String),
-        receivedStatusColumn:0,
-        completedStatusColumn:0,
+        receivedStatusColumn: 0,
+        completedStatusColumn: 0,
       },
       where: 'id = ?',
       whereArgs: [concession.id],
@@ -61,15 +119,25 @@ class ConcessionService {
       throw CouldNotUpdateNote();
     } else {
       final updatedConcession = await getConcession(id: concession.id);
-      // _concessions.removeWhere((concession) => concession.id == updatedConcession.id);
-      // _concessions.add(updatedConcession);
-      // _concessionsStreamController.add(_concessions);
+      _concessions
+          .removeWhere((concession) => concession.id == updatedConcession.id);
+      _concessions.add(updatedConcession);
+      _concessionsStreamController.add(_concessions);
       return updatedConcession;
     }
   }
 
+  Future<Iterable<DatabaseConcession>> getAllNotes() async {
+    await _ensureDbIsOpen();
+    final db2 = _getDatabaseOrThrow();
+    final concessions = await db2.query(concessionTable);
+
+    return concessions
+        .map((concessionRow) => DatabaseConcession.fromRow(concessionRow));
+  }
+
   Future<DatabaseConcession> getConcession({required int id}) async {
-    // await _ensureDbIsOpen();
+    await _ensureDbIsOpen();
     final db2 = _getDatabaseOrThrow();
     final concessions = await db2.query(
       concessionTable,
@@ -82,15 +150,16 @@ class ConcessionService {
       throw CouldNotFindNote();
     } else {
       final concession = DatabaseConcession.fromRow(concessions.first);
-      // _concessions.removeWhere((concession) => concession.id == id);
-      // _concessions.add(concession);
-      // _concessionsStreamController.add(_concessions);
+      _concessions.removeWhere((concession) => concession.id == id);
+      _concessions.add(concession);
+      _concessionsStreamController.add(_concessions);
       return concession;
     }
   }
 
-  Future<DatabaseConcession> createConcession({required DatabaseUser owner}) async {
-    // await _ensureDbIsOpen();
+  Future<DatabaseConcession> createConcession(
+      {required DatabaseUser owner}) async {
+    await _ensureDbIsOpen();
     final db2 = _getDatabaseOrThrow();
 
     // make sure owner exists in the database with the correct id
@@ -99,49 +168,48 @@ class ConcessionService {
       throw CouldNotFindUser();
     }
 
-   
     // create the note
     final concessionId = await db2.insert(concessionTable, {
       userIdColumn: owner.id,
-      nameColumn:"",
-      genderColumn:"",
+      nameColumn: "",
+      genderColumn: "",
       emailColumn: owner.email,
-      nearestStationColumn:"",
-      addressColumn:"",
-      dobColumn:DateTime.parse(date as String),
-      destinationStationColumn:"Andheri",
-      trainClassColumn:"",
-      periodColumn:"",
-      dateOfApplicationColumn:DateTime.parse(date as String),
-      receivedStatusColumn:0,
-      completedStatusColumn:0,
+      nearestStationColumn: "",
+      addressColumn: "",
+      dobColumn: DateTime.parse(date as String),
+      destinationStationColumn: "Andheri",
+      trainClassColumn: "",
+      periodColumn: "",
+      dateOfApplicationColumn: DateTime.parse(date as String),
+      receivedStatusColumn: 0,
+      completedStatusColumn: 0,
     });
 
     final concession = DatabaseConcession(
       id: concessionId,
       userId: owner.id,
-      name:"",
-      gender:"",
+      name: "",
+      gender: "",
       email: owner.email,
-      nearestStation:"",
-      address:"",
-      dob:date,
-      destinationStation:"Andheri",
-      trainClass:"",
-      period:"",
+      nearestStation: "",
+      address: "",
+      dob: date,
+      destinationStation: "Andheri",
+      trainClass: "",
+      period: "",
       dateOfApplication: date,
-      receivedStatus:false,
+      receivedStatus: false,
       completedStatus: false,
     );
 
-    // _concessions.add(concession);
-    // _notesStreamController.add(_concessions);
+    _concessions.add(concession);
+    _concessionsStreamController.add(_concessions);
 
     return concession;
   }
 
   Future<DatabaseUser> getUser({required String email}) async {
-    // await _ensureDbIsOpen();
+    await _ensureDbIsOpen();
     final db2 = _getDatabaseOrThrow();
 
     final results = await db2.query(
@@ -159,7 +227,7 @@ class ConcessionService {
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
-    // await _ensureDbIsOpen();
+    await _ensureDbIsOpen();
     final db2 = _getDatabaseOrThrow();
     final results = await db2.query(
       userTable,
@@ -182,7 +250,7 @@ class ConcessionService {
   }
 
   Future<void> deleteUser({required String email}) async {
-    // await _ensureDbIsOpen();
+    await _ensureDbIsOpen();
     final db2 = _getDatabaseOrThrow();
     final deletedCount = await db2.delete(
       userTable,
@@ -213,6 +281,14 @@ class ConcessionService {
     }
   }
 
+  Future<void> _ensureDbIsOpen() async {
+    try {
+      await open();
+    } on DatabaseAlreadyOpenException {
+      // empty
+    }
+  }
+
   Future<void> open() async {
     if (_db2 != null) {
       throw DatabaseAlreadyOpenException();
@@ -226,7 +302,7 @@ class ConcessionService {
       await db2.execute(createUserTable);
       // // create note table
       await db2.execute(createConcessiontable);
-      // await _cacheNotes();
+      await _cacheConcessions();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
     }
